@@ -1,0 +1,56 @@
+---
+# tasks file for nginx
+- name: nginx | Install nginx
+  yum:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: nginx | Remove all enabled sites
+  file:
+    path: "{{ nginx_sites_enabled_path }}"
+    state: absent
+  when: nginx_remove_all_sites
+
+- name: nginx | Create the directories for site specific configurations
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ nginx_conf_user }}"
+    group: "{{ nginx_conf_group }}"
+    mode: 0755
+  with_items:
+    - "{{ nginx_sites_available_path }}"
+    - "{{ nginx_sites_enabled_path }}"
+
+- name: nginx | Copy the nginx configuration file
+  template:
+    src: "{{ nginx_template_path }}/nginx.conf.j2"
+    dest: "{{ nginx_conf_dir }}/nginx.conf"
+    backup: yes
+  notify:
+    - check nginx configuration
+    - restart service nginx
+
+- name: nginx | Create the configurations for sites
+  template:
+    src: "{{ item }}"
+    dest: "{{ nginx_sites_available_path }}"
+    owner: "{{ nginx_conf_user }}"
+    group: "{{ nginx_conf_group }}"
+  with_fileglob:
+    - "{{ nginx_template_path }}/*.conf"
+  notify:
+    - restart service nginx
+
+- name: nginx | Enable new vhosts in nginx
+  file:
+    src: "{{ nginx_sites_available_path }}/{{ item | basename }}"
+    dest: "{{ nginx_sites_enabled_path }}/{{ item | basename }}"
+    owner: "{{ nginx_conf_user }}"
+    group: "{{ nginx_conf_group }}"
+    state: link
+  with_fileglob:
+    - "{{ nginx_template_path }}/*.conf"
+  notify:
+    - restart service nginx
