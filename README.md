@@ -17,9 +17,9 @@ Dependencies
 ------------
 
 Также необходимо открыть следующие порты в firewall
-  - port: 80/tcp
+- port: 80/tcp
 или
-  - service: http
+- service: http
 
 Example Playbook
 ----------------
@@ -38,4 +38,4 @@ BSD
 Author Information
 ------------------
 
-Chubik Sergey, chubik@ekaterinburg.fsin.uis.
+Chubik Sergey.
