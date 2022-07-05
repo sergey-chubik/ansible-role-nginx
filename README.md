@@ -18,8 +18,8 @@ Dependencies
 
 Также необходимо открыть следующие порты или службы в firewall:
 ```
- - port: 80/tcp
-  - service: http
+- port: 80/tcp
+- service: http
 ```
 
 Example Playbook
